@@ -1,45 +1,31 @@
 from abc import ABC, abstractmethod
 
 class Usuario(ABC):
-    
-    def __init__(self, nombre, correo, clave, rol):
-        self._nombre = nombre
+    def __init__(self, nombres="", correo="", clave=""):
+        self._nombres = nombres
         self._correo = correo
         self._clave = clave
-    
+
     @property
-    def nombre(self):
-        return self._nombre
-    
-    @nombre.setter
-    def nombre(self, nuevo):
-        if nuevo:
-            self._nombre = nuevo
-    
+    def nombres(self):
+        return self._nombres
+
+    @nombres.setter
+    def nombres(self, value):
+        self._nombres = value
+
     @property
     def correo(self):
         return self._correo
-    
+
     @correo.setter
-    def correo(self, nuevo):
-        if nuevo:
-            self._correo = nuevo
-            
+    def correo(self, value):
+        self._correo = value
+
     @property
     def clave(self):
         return self._clave
-    
+
     @clave.setter
-    def clave(self, nuevo):
-        if nuevo:
-            self._clave = nuevo
-            
-    def Iniciar_Sesion(self):
-        print(f"{self._nombre} ha iniciado sesión.")
-        
-    def Cerrar_Sesion(self):
-        print(f"{self._nombre} ha cerrado sesión.")
-        
-    @abstractmethod
-    def mostrar_informacion(self):
-        pass
+    def clave(self, value):
+        self._clave = value
