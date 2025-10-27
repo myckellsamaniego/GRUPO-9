@@ -1,2 +1,2 @@
 # GRUPO-9
-Colaboramos todos 
+El trabajo en equipo es mas rapido 
