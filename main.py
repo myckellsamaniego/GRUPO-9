@@ -1,4 +1,6 @@
 # main.py
+
+#prueba
 from models.administrador import Administrador
 from models.postulante import Postulante
 from models.universidad import Universidad
