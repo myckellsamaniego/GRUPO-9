@@ -1,31 +1,18 @@
 from abc import ABC, abstractmethod
 
 class Usuario(ABC):
-    def __init__(self, nombres="", correo="", clave=""):
-        self._nombres = nombres
-        self._correo = correo
-        self._clave = clave
+    def __init__(self, identificacion: str, nombre: str):
+        self._identificacion = identificacion
+        self._nombre = nombre
 
     @property
-    def nombres(self):
-        return self._nombres
-
-    @nombres.setter
-    def nombres(self, value):
-        self._nombres = value
+    def identificacion(self):
+        return self._identificacion
 
     @property
-    def correo(self):
-        return self._correo
+    def nombre(self):
+        return self._nombre
 
-    @correo.setter
-    def correo(self, value):
-        self._correo = value
-
-    @property
-    def clave(self):
-        return self._clave
-
-    @clave.setter
-    def clave(self, value):
-        self._clave = value
+    @abstractmethod
+    def obtener_tipo(self) -> str:
+        pass
