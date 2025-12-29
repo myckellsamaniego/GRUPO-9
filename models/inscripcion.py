@@ -1,15 +1,38 @@
 class Inscripcion:
+    ESTADOS = ("PENDIENTE", "APROBADA", "RECHAZADA")
 
     def __init__(self, postulante, oferta, validador):
-        self.postulante = postulante
-        self.oferta = oferta
-        self.validador = validador
-        self.aprobada = False
+        self._postulante = postulante
+        self._oferta = oferta
+        self._validador = validador
+        self._estado = "PENDIENTE"
+
+    @property
+    def estado(self):
+        return self._estado
+
+    @property
+    def postulante(self):
+        return self._postulante
+
+    @property
+    def oferta(self):
+        return self._oferta
 
     def validar(self):
-        return self.validador.validar(self.postulante, self.oferta)
+        if self._estado != "PENDIENTE":
+            raise ValueError("La inscripción ya fue procesada")
 
-    def aprobar(self):
-        if self.oferta.cupos > 0:
-            self.aprobada = True
-            self.oferta.cupos -= 1
+        es_valida = self._validador.validar(self._postulante, self._oferta)
+
+        if es_valida:
+            self._aprobar()
+        else:
+            self._rechazar()
+
+    def _aprobar(self):
+        self._oferta.ocupar_cupo()
+        self._estado = "APROBADA"
+
+    def _rechazar(self):
+        self._estado = "RECHAZADA"

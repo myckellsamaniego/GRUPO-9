@@ -1,5 +1,24 @@
 class DatosPersonales:
-    def __init__(self, nombre, apellidos, cedula, direccion, celular, correo, etnia, discapacidad):
+    def __init__(
+        self,
+        nombre: str,
+        apellidos: str,
+        cedula: str,
+        direccion: str,
+        celular: str,
+        correo: str,
+        etnia: str,
+        discapacidad: bool
+    ):
+        if not nombre or not apellidos:
+            raise ValueError("El nombre y apellidos son obligatorios")
+
+        if not cedula:
+            raise ValueError("La cédula es obligatoria")
+
+        if not correo:
+            raise ValueError("El correo es obligatorio")
+
         self._nombre = nombre
         self._apellidos = apellidos
         self._cedula = cedula
@@ -9,15 +28,34 @@ class DatosPersonales:
         self._etnia = etnia
         self._discapacidad = discapacidad
 
-    def Registrar(self):
-        print(f"Registrando datos personales de {self._nombre} {self._apellidos}")
+    @property
+    def nombre(self):
+        return self._nombre
 
-    def Actualizar(self):
-        print(f"Actualizando datos de {self._nombre}")
+    @property
+    def apellidos(self):
+        return self._apellidos
 
-    def Consultar(self):
-        return (
-            f"{self._nombre} {self._apellidos}, Cédula: {self._cedula}, "
-            f"Dirección: {self._direccion}, Correo: {self._correo}, Etnia: {self._etnia}, "
-            f"Discapacidad: {self._discapacidad}"
-        )
+    @property
+    def cedula(self):
+        return self._cedula
+
+    @property
+    def direccion(self):
+        return self._direccion
+
+    @property
+    def celular(self):
+        return self._celular
+
+    @property
+    def correo(self):
+        return self._correo
+
+    @property
+    def etnia(self):
+        return self._etnia
+
+    @property
+    def discapacidad(self):
+        return self._discapacidad

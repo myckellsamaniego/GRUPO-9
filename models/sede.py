@@ -1,19 +1,36 @@
 class Sede:
-    def __init__(self, nombre, direccion, ciudad, capacidad):
+    def __init__(self, nombre: str, direccion: str, ciudad: str, capacidad: int):
+        if not nombre or not ciudad:
+            raise ValueError("El nombre y la ciudad de la sede son obligatorios")
+        if capacidad <= 0:
+            raise ValueError("La capacidad debe ser mayor que cero")
+
         self._nombre = nombre
         self._direccion = direccion
         self._ciudad = ciudad
         self._capacidad = capacidad
-    
-    def Registrar_Sede(self):
-        print(f"Sede '{self._nombre}' registrada en {self._ciudad}.")
-    
-    def Modificar(self, direccion=None, capacidad=None):
+
+    @property
+    def nombre(self):
+        return self._nombre
+
+    @property
+    def direccion(self):
+        return self._direccion
+
+    @property
+    def ciudad(self):
+        return self._ciudad
+
+    @property
+    def capacidad(self):
+        return self._capacidad
+
+    def actualizar(self, direccion=None, capacidad=None):
         if direccion:
             self._direccion = direccion
         if capacidad:
+            if capacidad <= 0:
+                raise ValueError("La capacidad debe ser mayor que cero")
             self._capacidad = capacidad
-        print(f"Sede '{self._nombre}' actualizada correctamente.")
-    
-    def Consultar_Sede(self):
-        return f"{self._nombre} - {self._direccion}, Capacidad: {self._capacidad}"
+            

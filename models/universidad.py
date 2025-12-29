@@ -1,25 +1,21 @@
 class Universidad:
-    def __init__(self, nombre):
+    def __init__(self, nombre: str):
+        if not nombre:
+            raise ValueError("El nombre de la universidad es obligatorio")
+
         self._nombre = nombre
         self._ofertas_academicas = []
         self._periodos = []
-    
+
     @property
     def nombre(self):
         return self._nombre
-    
-    @nombre.setter
-    def nombre(self, nuevo):
-        if nuevo:
-            self._nombre = nuevo
-    
-    def Crear_Periodo(self, periodo):
+
+    def agregar_periodo(self, periodo):
         self._periodos.append(periodo)
-        print(f"Periodo '{periodo.nombre}' registrado en {self._nombre}.")
-    
-    def Oferta_Academica(self, oferta):
+
+    def agregar_oferta(self, oferta):
         self._ofertas_academicas.append(oferta)
-        print(f"Oferta '{oferta.nombre_carrera}' agregada a la universidad {self._nombre}.")
-    
-    def Consultar_Ofertas(self):
-        return [o.nombre_carrera for o in self._ofertas_academicas]
+
+    def consultar_ofertas(self):
+        return self._ofertas_academicas
