@@ -1,4 +1,4 @@
-from validators.validador_inscripcion import ValidadorInscripcion
+from strategy.estrategia_validador import EstrategiaValidador
 
 # ============================================================
 # IMPLEMENTACIÓN CONCRETA DEL STRATEGY
