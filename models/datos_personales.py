@@ -59,3 +59,15 @@ class DatosPersonales:
     @property
     def discapacidad(self):
         return self._discapacidad
+    
+    def datos_obligatorios_completos(self) -> bool:
+        """
+        Este método permite a los validadores verificar
+        que los datos personales estén completos.
+        """
+        return all([
+            self._nombre,
+            self._apellidos,
+            self._cedula,
+            self._correo
+        ])
