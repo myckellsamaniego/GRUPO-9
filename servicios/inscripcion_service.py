@@ -1,5 +1,5 @@
-from excepciones.errores_incripcion import InscripcionDuplicadaError, CuposAgotadosError
-
+from excepciones.errores_inscripcion import InscripcionDuplicadaError, CuposAgotadosError
+from models.inscripcion import Inscripcion
 
 class InscripcionService:
 
@@ -23,5 +23,7 @@ class InscripcionService:
         if inscripcion.validar():
             inscripcion.aprobar()
             self.repositorio.guardar(inscripcion)
+            return True
         else:
             self.repositorio.guardar(inscripcion)
+            return False

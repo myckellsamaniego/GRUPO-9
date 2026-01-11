@@ -20,7 +20,7 @@ class Inscripcion:
     def oferta(self):
         return self._oferta
 
-    def validar(self):
+    def validar(self)-> None:
         """
         TEMPLATE METHOD:
         Define el flujo fijo del proceso de inscripción.

@@ -9,7 +9,7 @@ from strategy.estrategia_validador import EstrategiaValidador
 # Implementa la interfaz ValidadorInscripcion
 # ============================================================
 
-class ValidadorDatosCompletos(ValidadorInscripcion):
+class ValidadorDatosCompletos(EstrategiaValidador):
 
     def validar(self, postulante, oferta) -> bool:
         datos = postulante.datos_personales

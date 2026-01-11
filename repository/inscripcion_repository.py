@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-
+import json
+import os
 
 #  Interfaz del Repository 
 class InscripcionRepository(ABC):
@@ -51,3 +52,20 @@ class InscripcionRepositoryMemoria(InscripcionRepository):
             i for i in self._inscripciones
             if i.postulante.identificacion != identificacion
         ]
+class InscripcionRepositoryJSON:
+    def __init__(self, archivo="inscripciones.json"):
+        self.archivo = archivo
+
+    def guardar(self, inscripcion):
+        datos = self.listar()
+        datos.append(inscripcion.to_dict())
+        with open(self.archivo, 'w', encoding='utf-8') as f:
+            json.dump(datos, f, indent=4, ensure_ascii=False)
+
+    def listar(self):
+        if not os.path.exists(self.archivo): return []
+        try:
+            with open(self.archivo, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except json.JSONDecodeError: # Maneja el caso de un archivo JSON vacío o corrupto
+            return []
