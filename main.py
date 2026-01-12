@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from gui.login import LoginApp
+from gui.LoginApp import LoginApp
 from repository.usuario_repository import UsuarioRepository
 from servicios.autenticacion_servicios import AutenticacionServicios
 from models.administrador import Administrador

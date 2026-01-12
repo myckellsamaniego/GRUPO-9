@@ -1,36 +1,37 @@
-from abc import ABC, abstractmethod
-
-# Interfaz del producto
-class ValidadorInscripcion(ABC):
-
-    @abstractmethod
-    def validar(self, postulante, oferta):
-        pass
+from typing import List
+from strategy.estrategia_validador import EstrategiaValidador
+from strategy.validador_datos_completos import ValidadorDatosCompletos
+from strategy.validador_cupos import ValidadorCupos
 
 
-# Implementaciones concretas del Validador
-class ValidacionRegular(ValidadorInscripcion):
+class ValidadorProcesoInscripcion:
 
-    def validar(self, postulante, oferta):
-        # Reglas para inscripción regular
-        return postulante.promedio >= 7 and oferta.cupos > 0
+    def __init__(self, validadores: List[EstrategiaValidador]):
+        self._validadores = validadores
+
+    def validar(self, contexto: dict):
+        """
+        Ejecuta todos los validadores.
+        Si uno falla, se lanza la excepción y se detiene el proceso.
+
+        El contexto debe contener:
+        - 'postulante'
+        - 'periodo'
+        - 'sede'
+        - 'oferta' (si aplica)
+        """
+        for validador in self._validadores:
+            validador.validar(contexto)
 
 
-class ValidacionExtraordinaria(ValidadorInscripcion):
-
-    def validar(self, postulante, oferta):
-        # Reglas para inscripción extraordinaria
-        return postulante.promedio >= 5 and oferta.cupos > 0
-
-
-# Fábrica con Factory Method
 class ValidadorFactory:
-
-    def crear_validador(self, tipo_validacion: str) -> ValidadorInscripcion:
-        if tipo_validacion == "regular":
-            return ValidacionRegular()
-        elif tipo_validacion == "extraordinaria":
-            return ValidacionExtraordinaria()
-        else:
-            raise ValueError(f"Tipo de validación no válido: '{tipo_validacion}'")
-
+    @staticmethod
+    def crear_validador_inscripcion() -> ValidadorProcesoInscripcion:
+        """
+        Construye el validador completo para INSCRIPCIÓN.
+        """
+        validadores = [
+            ValidadorDatosCompletos(),
+            ValidadorCupos(),
+        ]
+        return ValidadorProcesoInscripcion(validadores)
