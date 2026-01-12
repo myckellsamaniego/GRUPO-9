@@ -3,6 +3,7 @@ from tkinter import messagebox
 
 from gui.app_admin import AdminApp
 from gui.app_postulante import PostulanteApp
+from gui.registro import RegistroApp
 
 
 class LoginApp:
@@ -26,6 +27,13 @@ class LoginApp:
             text="Ingresar",
             command=self.login
         ).pack(pady=15)
+        
+        tk.Button(
+            root,
+            text="Crear cuenta",
+            command=self.abrir_registro
+        ).pack()
+
 
     def login(self):
         try:
@@ -53,3 +61,7 @@ class LoginApp:
 
         except ValueError as e:
             messagebox.showerror("Error de autenticación", str(e))
+
+    def abrir_registro(self):
+        ventana = tk.Toplevel(self.root)
+        RegistroApp(ventana, self.auth_service._repo)
