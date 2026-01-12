@@ -1,24 +1,28 @@
 from abc import ABC, abstractmethod
 
 class Usuario(ABC):
-    def __init__(self, identificacion: str, nombre: str):
-        if not identificacion or not nombre:
-            raise ValueError("La identificación y el nombre son obligatorios")
+    """
+    Clase base de autenticación del sistema
+    """
 
-        self._identificacion = identificacion
-        self._nombre = nombre
+    def __init__(self, correo: str, password: str):
+        if not correo or not password:
+            raise ValueError("Correo y contraseña son obligatorios")
+
+        self._correo = correo
+        self._password = password
 
     @property
-    def identificacion(self):
-        return self._identificacion
+    def correo(self):
+        return self._correo
 
     @property
-    def nombre(self):
-        return self._nombre
+    def password(self):
+        return self._password
 
     @abstractmethod
     def obtener_tipo(self) -> str:
         pass
 
     def __str__(self):
-        return f"{self.obtener_tipo()} - {self.nombre} ({self.identificacion})"
+        return f"{self.obtener_tipo()} - {self.correo}"

@@ -1,14 +1,25 @@
-class AutenticacionServicios:
-    def __init__(self, usuario_repository):
-        self._repo = usuario_repository
+class AutenticacionService:
+    """
+    SERVICE:
+    Contiene la lógica de autenticación del sistema.
+    """
 
-    def login(self, correo:str, password:str):
-        usuario = self._repo.buscar_por_correo(correo)
+    def __init__(self, usuario_repository):
+        self._usuario_repository = usuario_repository
+
+    def login(self, correo: str, password: str):
+        """
+        Valida credenciales y retorna el usuario autenticado.
+        """
+        if not correo or not password:
+            raise ValueError("Correo y contraseña son obligatorios")
+
+        usuario = self._usuario_repository.buscar_por_correo(correo)
 
         if not usuario:
-            raise ValueError("Usuario no encontrado")
+            raise ValueError("Usuario no registrado")
 
-        if not usuario.validar_password(password):
+        if usuario.password != password:
             raise ValueError("Contraseña incorrecta")
 
-        return usuario  # ← aquí ya viene con su rol
+        return usuario

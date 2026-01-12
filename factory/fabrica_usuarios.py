@@ -6,21 +6,27 @@ class FabricaUsuarios:
     FACTORY METHOD:
     Centraliza la creación de usuarios del sistema.
 
-    - crear_usuario(): cuando el sistema CREA usuarios nuevos
-    - crear_desde_dict(): cuando el sistema RECONSTRUYE desde JSON
+    - crear_usuario(): creación desde GUI (registro)
+    - crear_desde_dict(): reconstrucción desde JSON
     """
 
     # ===== CASO 1: creación normal (GUI, registro) =====
     def crear_usuario(self, tipo_usuario: str, **kwargs):
 
         if tipo_usuario == "Postulante":
-            return Postulante(kwargs["datos_personales"])
+            return Postulante(
+                correo=kwargs["correo"],
+                password=kwargs["password"],
+                datos_personales=kwargs["datos_personales"]
+            )
 
         elif tipo_usuario == "Administrador":
             return Administrador(
-                kwargs["identificacion"],
-                kwargs["nombre"],
-                kwargs["admin_id"]
+                identificacion=kwargs["identificacion"],
+                nombre=kwargs["nombre"],
+                correo=kwargs["correo"],
+                password=kwargs["password"],
+                admin_id=kwargs["admin_id"]
             )
 
         else:
@@ -33,12 +39,16 @@ class FabricaUsuarios:
             return Administrador(
                 identificacion=data["identificacion"],
                 nombre=data["nombre"],
+                correo=data["correo"],
+                password=data["password"],
                 admin_id=data["admin_id"]
             )
 
         elif data["tipo"] == "POSTULANTE":
             return Postulante(
-                datos_personales=data["datos_personales"]  # luego se reconstruye
+                correo=data["correo"],
+                password=data["password"],
+                datos_personales=None  # se reconstruyen después
             )
 
         else:

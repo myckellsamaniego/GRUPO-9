@@ -71,3 +71,34 @@ class DatosPersonales:
             self._cedula,
             self._correo
         ])
+        
+    def to_dict(self) -> dict:
+        """
+        Convierte el objeto a diccionario para persistencia.
+        """
+        return {
+            "nombre": self._nombre,
+            "apellidos": self._apellidos,
+            "cedula": self._cedula,
+            "direccion": self._direccion,
+            "celular": self._celular,
+            "correo": self._correo,
+            "etnia": self._etnia,
+            "discapacidad": self._discapacidad
+        }
+
+    @staticmethod
+    def from_dict(data: dict):
+        """
+        Reconstruye DatosPersonales desde JSON.
+        """
+        return DatosPersonales(
+            nombre=data["nombre"],
+            apellidos=data["apellidos"],
+            cedula=data["cedula"],
+            direccion=data["direccion"],
+            celular=data["celular"],
+            correo=data["correo"],
+            etnia=data["etnia"],
+            discapacidad=data["discapacidad"]
+        )
