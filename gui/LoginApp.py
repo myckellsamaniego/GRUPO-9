@@ -37,13 +37,13 @@ class LoginApp:
 
     def login(self):
         try:
-            # 🔐 Autenticación (Service)
+            #  Autenticación (Service)
             usuario = self.auth_service.autenticar(
                 self.correo.get(),
                 self.password.get()
             )
 
-            # 🧠 Decisión por rol (vida real)
+            #  Decisión por rol (vida real)
             self.root.destroy()
 
             if usuario.obtener_tipo() == "ADMIN":

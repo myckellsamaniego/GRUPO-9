@@ -27,3 +27,6 @@ class InscripcionService:
         else:
             self.repositorio.guardar(inscripcion)
             return False
+
+    def listar(self):
+        return self._repositorio.listar()
