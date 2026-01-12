@@ -6,14 +6,18 @@ from repository.inscripcion_repository import InscripcionRepository
 
 
 class AdminApp:
+    """
+    GUI del Administrador del Sistema de Admisión
+    """
+
     def __init__(self, root, administrador):
         self.root = root
         self.administrador = administrador
 
         self.root.title("Panel Administrador - Sistema de Admisión")
-        self.root.geometry("700x400")
+        self.root.geometry("800x450")
 
-        # Servicio
+        # Servicio (Service Layer)
         self.inscripcion_service = InscripcionService(
             InscripcionRepository()
         )
@@ -21,14 +25,38 @@ class AdminApp:
         self.crear_interfaz()
         self.cargar_inscripciones()
 
+    # INTERFAZ 
+
     def crear_interfaz(self):
         ttk.Label(
             self.root,
             text=f"Administrador: {self.administrador.nombre}",
-            font=("Arial", 14, "bold")
+            font=("Arial", 15, "bold")
         ).pack(pady=10)
 
-        # Tabla
+        # Botones superiores
+        botones_frame = ttk.Frame(self.root)
+        botones_frame.pack(pady=5)
+
+        ttk.Button(
+            botones_frame,
+            text="Actualizar Inscripciones",
+            command=self.cargar_inscripciones
+        ).grid(row=0, column=0, padx=10)
+
+        ttk.Button(
+            botones_frame,
+            text="Gestionar Periodos",
+            command=self.gestionar_periodos
+        ).grid(row=0, column=1, padx=10)
+
+        ttk.Button(
+            botones_frame,
+            text="Cerrar Sesión",
+            command=self.cerrar_sesion
+        ).grid(row=0, column=2, padx=10)
+
+        # Tabla de inscripciones
         columnas = ("cedula", "postulante", "carrera", "estado")
 
         self.tabla = ttk.Treeview(
@@ -44,22 +72,16 @@ class AdminApp:
 
         self.tabla.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
 
-        ttk.Button(
-            self.root,
-            text="Actualizar",
-            command=self.cargar_inscripciones
-        ).pack(pady=10)
+    #  FUNCIONALIDAD 
 
     def cargar_inscripciones(self):
-        # Limpiar tabla
         for fila in self.tabla.get_children():
             self.tabla.delete(fila)
 
         registros = self.inscripcion_service.listar()
 
         if not registros:
-            messagebox.showinfo("Información", "No hay inscripciones registradas")
-            return
+            return  # No molestar al admin
 
         for ins in registros:
             self.tabla.insert(
@@ -72,3 +94,15 @@ class AdminApp:
                     ins["estado_inscripcion"]
                 )
             )
+
+    def gestionar_periodos(self):
+        """
+        Placeholder correcto para defensa académica.
+        """
+        messagebox.showinfo(
+            "Gestión de Periodos",
+            "Aquí el administrador podrá activar o cerrar periodos de admisión."
+        )
+
+    def cerrar_sesion(self):
+        self.root.destroy()
