@@ -15,7 +15,7 @@ def inicializar_admin(repo):
     admin_correo = "admin@uleam.edu.ec"
 
     if repo.buscar_por_correo(admin_correo):
-        return  # Ya existe, no duplicar
+        return 
 
     fabrica = FabricaUsuarios()
 

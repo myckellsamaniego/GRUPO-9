@@ -1,6 +1,7 @@
 import json
 import os
-from factories.fabrica_usuarios import FabricaUsuarios
+from factory.fabrica_usuarios import FabricaUsuarios
+
 
 class UsuarioRepositoryJSON:
     """

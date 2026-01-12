@@ -16,3 +16,15 @@ class CuposAgotadosError(InscripcionError):
 class DatosIncompletosError(InscripcionError):
     """Faltan datos personales obligatorios"""
     pass
+
+class ErrorDatosIncompletos(Exception):
+    """
+    Se lanza cuando el postulante no ha completado sus datos personales.
+    """
+    pass
+
+class ErrorCuposNoDisponibles(Exception):
+    """
+    Se lanza cuando la oferta académica no tiene cupos disponibles.
+    """
+    pass
