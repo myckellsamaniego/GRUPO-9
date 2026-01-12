@@ -10,7 +10,7 @@ from repository.inscripcion_repository import InscripcionRepositoryJSON
 from servicios.inscripcion_service import InscripcionService
 from strategy.validador_datos_completos import ValidadorDatosCompletos
 from strategy.validador_cupos import ValidadorCupos
-from factories.fabrica_usuarios import FabricaUsuarios
+from factory.fabrica_usuarios import FabricaUsuarios
 from excepciones.errores_inscripcion import InscripcionDuplicadaError, CuposAgotadosError
 
 class AdmisionApp:
