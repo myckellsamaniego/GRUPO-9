@@ -12,8 +12,8 @@ class UsuarioRepositoryJSON:
         self._fabrica = FabricaUsuarios()
 
         if not os.path.exists(self._archivo):
-            with open(self._archivo, "w") as f:
-                json.dump([], f)
+            self._crear_archivo_con_admin()
+
 
     def _leer(self):
         with open(self._archivo, "r") as f:
@@ -67,3 +67,24 @@ class UsuarioRepositoryJSON:
             }
 
         raise ValueError("Tipo de usuario no soportado")
+    
+    def _crear_archivo_con_admin(self):
+        """
+        Inicializa el sistema con un administrador por defecto.
+        Esto simula un sistema real donde el admin ya existe.
+        """
+
+        admin_inicial = [
+            {
+                "tipo": "ADMIN",
+                "identificacion": "ADM001",
+                "nombre": "Administrador Principal",
+                "correo": "admin@uleam.edu.ec",
+                "password": "admin123",
+                "admin_id": "ADMIN-001"
+            }
+        ]   
+
+        with open(self._archivo, "w") as f:
+            json.dump(admin_inicial, f, indent=4)
+

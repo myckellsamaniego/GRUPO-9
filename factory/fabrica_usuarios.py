@@ -10,7 +10,7 @@ class FabricaUsuarios:
     - crear_desde_dict(): reconstrucción desde JSON
     """
 
-    # ===== CASO 1: creación normal (GUI, registro) =====
+    # creación normal (GUI, registro) 
     def crear_usuario(self, tipo_usuario: str, **kwargs):
 
         if tipo_usuario == "Postulante":
@@ -32,7 +32,7 @@ class FabricaUsuarios:
         else:
             raise ValueError(f"Tipo de usuario no válido: '{tipo_usuario}'")
 
-    # ===== CASO 2: reconstrucción desde persistencia =====
+    #  construcción desde persistencia 
     def crear_desde_dict(self, data: dict):
 
         if data["tipo"] == "ADMIN":
