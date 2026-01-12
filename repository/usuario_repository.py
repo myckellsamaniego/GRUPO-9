@@ -1,13 +1,18 @@
-class UsuarioRepository:
-    def __init__(self):
-        
-        self._usuarios = []
+from abc import ABC, abstractmethod
 
+class UsuarioRepository(ABC):
+    """
+    REPOSITORY (INTERFAZ)
+    """
+
+    @abstractmethod
     def agregar(self, usuario):
-        self._usuarios.append(usuario)
+        pass
 
+    @abstractmethod
     def buscar_por_correo(self, correo):
-        for u in self._usuarios:
-            if u.correo == correo:
-                return u
-        return None
+        pass
+
+    @abstractmethod
+    def listar(self):
+        pass
