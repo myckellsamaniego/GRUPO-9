@@ -27,41 +27,44 @@ class LoginApp:
             text="Ingresar",
             command=self.login
         ).pack(pady=15)
-        
+
         tk.Button(
             root,
             text="Crear cuenta",
             command=self.abrir_registro
         ).pack()
 
-
     def login(self):
         try:
-            #  Autenticación (Service)
-            usuario = self.auth_service.autenticar(
+            # Autenticación correcta (SERVICE)
+            usuario = self.auth_service.login(
                 self.correo.get(),
                 self.password.get()
             )
 
-            #  Decisión por rol (vida real)
+            # Cerrar login
             self.root.destroy()
 
-            if usuario.obtener_tipo() == "ADMIN":
-                root = tk.Tk()
-                AdminApp(root, usuario)
-                root.mainloop()
+            root = tk.Tk()
 
-            elif usuario.obtener_tipo() == "POSTULANTE":
-                root = tk.Tk()
+            # Decisión REAL por rol
+            if usuario.obtener_tipo() == "Administrador":
+                AdminApp(root, usuario)
+
+            elif usuario.obtener_tipo() == "Postulante":
                 PostulanteApp(root, usuario)
-                root.mainloop()
 
             else:
                 raise ValueError("Rol de usuario no reconocido")
+
+            root.mainloop()
 
         except ValueError as e:
             messagebox.showerror("Error de autenticación", str(e))
 
     def abrir_registro(self):
         ventana = tk.Toplevel(self.root)
-        RegistroApp(ventana, self.auth_service._repo)
+        RegistroApp(
+            ventana,
+            self.auth_service._usuario_repository
+        )
