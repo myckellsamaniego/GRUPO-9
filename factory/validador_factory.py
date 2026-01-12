@@ -2,6 +2,7 @@ from typing import List
 from strategy.estrategia_validador import EstrategiaValidador
 from strategy.validador_datos_completos import ValidadorDatosCompletos
 from strategy.validador_cupos import ValidadorCupos
+from strategy.validador_postulacion import ValidadorPostulacion
 
 
 class ValidadorProcesoInscripcion:
@@ -35,3 +36,9 @@ class ValidadorFactory:
             ValidadorCupos(),
         ]
         return ValidadorProcesoInscripcion(validadores)
+    @staticmethod
+    def crear_validador_postulacion():
+        return ValidadorProcesoInscripcion([
+            ValidadorPostulacion()
+    ])
+
