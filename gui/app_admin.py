@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+from repository.inscripcion_repository_json import InscripcionRepositoryJSON
 from servicios.inscripcion_service import InscripcionService
-from repository.inscripcion_repository import InscripcionRepository
 
 
 class AdminApp:
@@ -17,9 +17,9 @@ class AdminApp:
         self.root.title("Panel Administrador - Sistema de Admisión")
         self.root.geometry("800x450")
 
-        # Servicio (Service Layer)
+        # USAR IMPLEMENTACIÓN CONCRETA
         self.inscripcion_service = InscripcionService(
-            InscripcionRepository()
+            InscripcionRepositoryJSON()
         )
 
         self.crear_interfaz()

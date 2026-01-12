@@ -48,7 +48,7 @@ class LoginApp:
             root = tk.Tk()
 
             # Decisión REAL por rol
-            if usuario.obtener_tipo() == "Administrador":
+            if usuario.obtener_tipo() == "ADMIN":
                 AdminApp(root, usuario)
 
             elif usuario.obtener_tipo() == "Postulante":
