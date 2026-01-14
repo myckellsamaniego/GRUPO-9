@@ -1,5 +1,6 @@
 """
 GUI del Postulante - Sistema de Admisión
+Ahora incluye verificación de perfil completo
 """
 import tkinter as tk
 from tkinter import messagebox, ttk
@@ -9,18 +10,146 @@ from servicios.inscripcion_service import InscripcionService
 from repository.inscripcion_repository import InscripcionRepositoryJSON
 from models.oferta_academica import OfertaAcademica
 from excepciones.errores_inscripcion import InscripcionDuplicadaError, CuposAgotadosError
+from gui.formulario_completo import FormularioCompletoApp
 
 
 class PostulanteApp:
     """Interfaz gráfica para el postulante"""
 
-    def __init__(self, root, postulante):
+    def __init__(self, root, postulante, usuario_repo=None):
         self.root = root
         self.postulante = postulante
+        self.usuario_repo = usuario_repo
 
         self.root.title("Panel del Postulante - Sistema de Admisión ULEAM")
         self.root.geometry("700x550")
 
+        # Verificar si tiene perfil completo
+        self.tiene_perfil_completo = self.verificar_perfil_completo()
+        
+        if not self.tiene_perfil_completo:
+            # Si no tiene perfil completo, mostrar formulario
+            self.solicitar_completar_perfil()
+        else:
+            # Si ya tiene perfil completo, mostrar la interfaz normal
+            self.inicializar_app()
+
+    def verificar_perfil_completo(self):
+        """Verifica si el postulante tiene datos personales completos"""
+        datos = self.postulante.datos_personales
+        
+        # Verificar si es DatosPersonalesCompletos (tiene fecha_nacimiento)
+        if hasattr(datos, 'fecha_nacimiento') and datos.fecha_nacimiento:
+            return True
+        
+        # Si solo tiene DatosPersonales básicos, necesita completar
+        return False
+
+    def solicitar_completar_perfil(self):
+        """Solicita al postulante completar su perfil"""
+        # Mostrar mensaje informativo
+        info_frame = tk.Frame(self.root, bg="#dbeafe", padx=20, pady=20)
+        info_frame.pack(fill=tk.BOTH, expand=True)
+        
+        tk.Label(
+            info_frame,
+            text="📋 Complete su Perfil",
+            font=("Arial", 18, "bold"),
+            bg="#dbeafe",
+            fg="#1e40af"
+        ).pack(pady=(50, 20))
+        
+        tk.Label(
+            info_frame,
+            text="Para continuar con el proceso de admisión,\ndebe completar su información personal.",
+            font=("Arial", 12),
+            bg="#dbeafe",
+            fg="#1e3a8a",
+            justify=tk.CENTER
+        ).pack(pady=10)
+        
+        tk.Label(
+            info_frame,
+            text="Este es un formulario de 6 pasos que incluye:\n"
+                 "• Identificación personal\n"
+                 "• Datos de contacto\n"
+                 "• Autoidentificación étnica\n"
+                 "• Información sobre discapacidad\n"
+                 "• Recursos tecnológicos\n"
+                 "• Información educativa",
+            font=("Arial", 10),
+            bg="#dbeafe",
+            fg="#4b5563",
+            justify=tk.LEFT
+        ).pack(pady=20)
+        
+        btn_frame = tk.Frame(info_frame, bg="#dbeafe")
+        btn_frame.pack(pady=20)
+        
+        tk.Button(
+            btn_frame,
+            text="✓ Completar Perfil Ahora",
+            command=self.abrir_formulario_completo,
+            bg="#10b981",
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.FLAT,
+            padx=30,
+            pady=12,
+            cursor="hand2"
+        ).pack(side=tk.LEFT, padx=5)
+        
+        tk.Button(
+            btn_frame,
+            text="Cerrar Sesión",
+            command=self.root.destroy,
+            bg="#6b7280",
+            fg="white",
+            font=("Arial", 12, "bold"),
+            relief=tk.FLAT,
+            padx=30,
+            pady=12,
+            cursor="hand2"
+        ).pack(side=tk.LEFT, padx=5)
+
+    def abrir_formulario_completo(self):
+        """Abre el formulario completo de 6 pasos"""
+        # Obtener cédula del postulante
+        cedula = self.postulante.datos_personales.cedula
+        
+        # Crear ventana del formulario
+        formulario_window = tk.Toplevel(self.root)
+        FormularioCompletoApp(
+            formulario_window, 
+            self.usuario_repo, 
+            cedula_validada=cedula,
+            postulante_existente=self.postulante
+        )
+        
+        # Al cerrar el formulario, actualizar la ventana principal
+        def on_formulario_close():
+            # Recargar el postulante actualizado
+            if self.usuario_repo:
+                postulante_actualizado = self.usuario_repo.buscar_por_cedula(cedula)
+                if postulante_actualizado:
+                    self.postulante = postulante_actualizado
+                    self.tiene_perfil_completo = self.verificar_perfil_completo()
+                    
+                    if self.tiene_perfil_completo:
+                        # Limpiar ventana y mostrar interfaz completa
+                        for widget in self.root.winfo_children():
+                            widget.destroy()
+                        self.inicializar_app()
+                    else:
+                        messagebox.showwarning(
+                            "Perfil Incompleto",
+                            "Debe completar todo el formulario para continuar"
+                        )
+        
+        formulario_window.protocol("WM_DELETE_WINDOW", lambda: [formulario_window.destroy(), on_formulario_close()])
+
+    def inicializar_app(self):
+        """Inicializa la interfaz normal del postulante"""
         # Servicio
         self.inscripcion_service = InscripcionService(
             InscripcionRepositoryJSON()
@@ -51,7 +180,7 @@ class PostulanteApp:
         
         ttk.Label(
             header_frame,
-            text=f" Bienvenido/a {nombre_completo}",
+            text=f"👤 Bienvenido/a {nombre_completo}",
             font=("Arial", 16, "bold")
         ).pack()
 
@@ -140,7 +269,7 @@ class PostulanteApp:
 
         self.btn_inscribir = ttk.Button(
             botones_frame,
-            text=" Inscribirse",
+            text="📝 Inscribirse",
             command=self.inscribirse,
             width=20
         )
@@ -148,14 +277,14 @@ class PostulanteApp:
 
         ttk.Button(
             botones_frame,
-            text=" Actualizar Estado",
+            text="🔄 Actualizar Estado",
             command=self.mostrar_estado_actual,
             width=20
         ).grid(row=0, column=1, padx=5)
 
         ttk.Button(
             botones_frame,
-            text=" Cerrar Sesión",
+            text="🚪 Cerrar Sesión",
             command=self.cerrar_sesion,
             width=20
         ).grid(row=0, column=2, padx=5)
@@ -173,13 +302,13 @@ class PostulanteApp:
             # Configurar color según estado
             if estado == "APROBADA":
                 color = "green"
-                icono = ""
+                icono = "✅"
             elif estado == "RECHAZADA":
                 color = "red"
-                icono = ""
+                icono = "❌"
             else:
                 color = "orange"
-                icono = ""
+                icono = "⏳"
             
             self.estado_label.config(
                 text=f"{icono} Estado: {estado}",
@@ -200,7 +329,7 @@ class PostulanteApp:
         else:
             # No tiene inscripción
             self.estado_label.config(
-                text=" Sin inscripción registrada",
+                text="ℹ️ Sin inscripción registrada",
                 foreground="blue"
             )
             self.carrera_actual_label.config(text="")
@@ -247,7 +376,7 @@ class PostulanteApp:
             self.inscripcion_service.registrar(inscripcion)
 
             messagebox.showinfo(
-                " Inscripción Exitosa",
+                "✅ Inscripción Exitosa",
                 f"Su inscripción ha sido registrada exitosamente.\n\n"
                 f"Carrera: {oferta.nombre}\n"
                 f"Estado: {inscripcion.estado}\n\n"
@@ -261,13 +390,13 @@ class PostulanteApp:
             self.password_entry.delete(0, tk.END)
 
         except InscripcionDuplicadaError as e:
-            messagebox.showerror(" Error", str(e))
+            messagebox.showerror("❌ Error", str(e))
         except CuposAgotadosError as e:
-            messagebox.showerror(" Sin Cupos", str(e))
+            messagebox.showerror("⚠️ Sin Cupos", str(e))
         except ValueError as e:
-            messagebox.showerror(" Error de Validación", str(e))
+            messagebox.showerror("⚠️ Error de Validación", str(e))
         except Exception as e:
-            messagebox.showerror(" Error Inesperado", str(e))
+            messagebox.showerror("❌ Error Inesperado", str(e))
 
     def cerrar_sesion(self):
         """Cierra la sesión del postulante"""

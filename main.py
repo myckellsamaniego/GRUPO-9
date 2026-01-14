@@ -2,7 +2,7 @@
 Sistema de Admisión Universitaria - ULEAM 2026
 Punto de entrada principal de la aplicación
 
-Autor: [Tu nombre]
+Autor: Sistema de Admisión ULEAM
 Fecha: 2026
 """
 
@@ -14,7 +14,7 @@ import os
 # Agregar el directorio raíz al path para imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from gui.login_app import LoginApp
+from gui.login_app import LoginMejoradoApp
 from servicios.autenticacion_servicios import AutenticacionService
 from servicios.inicializacion_service import InicializacionService
 from repository.usuario_repository_json import UsuarioRepositoryJSON
@@ -28,14 +28,15 @@ def main():
     1. Crear repositorio de usuarios
     2. Inicializar administrador por defecto
     3. Crear servicio de autenticación
-    4. Lanzar interfaz de login
+    4. Lanzar interfaz de login mejorada
     """
     
     try:
-        print("=" * 50)
-        print("Sistema de Admisión ULEAM 2026")
-        print("=" * 50)
-        print("\nIniciando sistema...")
+        print("=" * 60)
+        print("    SISTEMA DE ADMISIÓN ULEAM 2026")
+        print("    Universidad Laica Eloy Alfaro de Manabí")
+        print("=" * 60)
+        print("\n🔄 Iniciando sistema...")
         
         # 1. Inicializar repositorio de usuarios
         print("✓ Inicializando repositorio de usuarios...")
@@ -50,24 +51,26 @@ def main():
         print("✓ Configurando servicio de autenticación...")
         auth_service = AutenticacionService(usuario_repo)
         
-        # 4. Iniciar interfaz gráfica
+        # 4. Iniciar interfaz gráfica mejorada
         print("✓ Iniciando interfaz gráfica...")
-        print("\n" + "=" * 50)
-        print("Sistema iniciado correctamente")
-        print("=" * 50)
-        print("\nCREDENCIALES DE ADMINISTRADOR:")
-        print("  Usuario: admin@uleam.edu.ec")
-        print("  Contraseña: admin123")
-        print("=" * 50 + "\n")
+        print("\n" + "=" * 60)
+        print("✓ Sistema iniciado correctamente")
+        print("=" * 60)
+        print("\n📋 CREDENCIALES DE ADMINISTRADOR:")
+        print("  📧 Usuario: admin@uleam.edu.ec")
+        print("  🔑 Contraseña: admin123")
+        print("=" * 60 + "\n")
         
         root = tk.Tk()
-        LoginApp(root, auth_service)
+        LoginMejoradoApp(root, auth_service, usuario_repo)
         root.mainloop()
         
         print("\n✓ Sistema cerrado correctamente")
         
     except Exception as e:
         print(f"\n✗ ERROR CRÍTICO: {e}")
+        import traceback
+        traceback.print_exc()
         messagebox.showerror(
             "Error Crítico",
             f"No se pudo iniciar el sistema:\n\n{e}\n\n"

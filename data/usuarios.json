@@ -1,0 +1,10 @@
+[
+  {
+    "tipo": "ADMIN",
+    "correo": "admin@uleam.edu.ec",
+    "password": "admin123",
+    "identificacion": "1234567890",
+    "nombre": "Administrador del Sistema",
+    "admin_id": "ADMIN001"
+  }
+]

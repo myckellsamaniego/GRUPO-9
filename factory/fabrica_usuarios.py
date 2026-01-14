@@ -1,6 +1,7 @@
 from models.postulante import Postulante
 from models.administrador import Administrador
 from models.datos_personales import DatosPersonales
+from models.datos_personales_completos import DatosPersonalesCompletos
 
 
 class FabricaUsuarios:
@@ -76,8 +77,15 @@ class FabricaUsuarios:
             )
 
         elif data["tipo"] == "POSTULANTE":
-            # Reconstruir datos personales desde el diccionario
-            datos_personales = DatosPersonales.from_dict(data["datos_personales"])
+            # Detectar si es DatosPersonales simple o completo
+            datos_dict = data["datos_personales"]
+            
+            # Si tiene campos del formulario completo, usar DatosPersonalesCompletos
+            if "fecha_nacimiento" in datos_dict or "estado_civil" in datos_dict:
+                datos_personales = DatosPersonalesCompletos.from_dict(datos_dict)
+            else:
+                # Usar DatosPersonales simple (retrocompatibilidad)
+                datos_personales = DatosPersonales.from_dict(datos_dict)
             
             return Postulante(
                 correo=data["correo"],

@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 """
 Ventana de Registro de Nuevos Postulantes
+Formulario básico para crear cuenta
 """
 import tkinter as tk
 from tkinter import messagebox, ttk
@@ -9,144 +11,338 @@ from factory.fabrica_usuarios import FabricaUsuarios
 
 
 class RegistroApp:
-    """Ventana de registro de nuevos postulantes"""
+    """Ventana de registro de nuevos postulantes con cédula pre-validada"""
 
-    def __init__(self, root, usuario_repo):
+    def __init__(self, root, usuario_repo, cedula_validada=None):
         self.root = root
         self.usuario_repo = usuario_repo
         self.fabrica = FabricaUsuarios()
+        self.cedula_validada = cedula_validada
 
-        self.root.title("Crear Cuenta - Postulante")
-        self.root.geometry("400x620")
+        self.root.title("Obtener Cuenta - Sistema ULEAM 2026")
+        self.root.geometry("600x550")
         self.root.resizable(False, False)
-
+        
+        # Centrar ventana
+        self.centrar_ventana()
+        
         self.crear_interfaz()
 
+    def centrar_ventana(self):
+        """Centra la ventana en la pantalla"""
+        self.root.update_idletasks()
+        width = 600
+        height = 550
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+
     def crear_interfaz(self):
-        # Frame principal
-        main_frame = ttk.Frame(self.root, padding="20")
-        main_frame.pack(expand=True, fill=tk.BOTH)
-
-        # Título
-        ttk.Label(
-            main_frame,
-            text="Registro de Nuevo Postulante",
-            font=("Arial", 14, "bold")
-        ).pack(pady=10)
-
-        # Formulario
-        form_frame = ttk.LabelFrame(main_frame, text="Datos Personales", padding="10")
-        form_frame.pack(fill=tk.BOTH, expand=True, pady=10)
+        # Header
+        header = tk.Frame(self.root, bg="#1e3a8a", height=70)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(
+            header,
+            text="📝 Obtener cuenta",
+            font=("Arial", 18, "bold"),
+            bg="#1e3a8a",
+            fg="white"
+        ).pack(pady=20)
+        
+        # Frame principal con scroll
+        main_canvas = tk.Canvas(self.root, bg="white")
+        scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=main_canvas.yview)
+        scrollable_frame = tk.Frame(main_canvas, bg="white")
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: main_canvas.configure(scrollregion=main_canvas.bbox("all"))
+        )
+        
+        main_canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        main_canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Contenido del formulario
+        form_frame = tk.Frame(scrollable_frame, bg="white", padx=40, pady=30)
+        form_frame.pack(fill=tk.BOTH, expand=True)
 
         self.entries = {}
+        row = 0
 
-        campos = [
-            ("Nombre*:", "Nombre"),
-            ("Apellidos*:", "Apellidos"),
-            ("Cédula*:", "Cedula"),
-            ("Celular:", "Celular"),
-            ("Dirección:", "Direccion"),
-            ("Correo*:", "Correo"),
-            ("Contraseña*:", "Password"),
-            ("Confirmar Contraseña*:", "Confirmar")
-        ]
+        # 1. TIPO DE DOCUMENTO
+        tk.Label(
+            form_frame,
+            text="Tipo de documento: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
 
-        for i, (label, key) in enumerate(campos):
-            ttk.Label(form_frame, text=label).grid(
-                row=i, column=0, sticky=tk.W, pady=5, padx=5
-            )
-            
-            if "Contraseña" in label or "Confirmar" in label:
-                entry = ttk.Entry(form_frame, show="*", width=25)
-            else:
-                entry = ttk.Entry(form_frame, width=25)
-            
-            entry.grid(row=i, column=1, sticky=tk.EW, pady=5, padx=5)
-            self.entries[key] = entry
+        self.tipo_doc_var = tk.StringVar(value="Cédula de ciudadanía ecuatoriana")
+        tipo_doc_combo = ttk.Combobox(
+            form_frame,
+            textvariable=self.tipo_doc_var,
+            values=[
+                "Cédula de ciudadanía ecuatoriana",
+                "Pasaporte",
+                "Documento extranjero"
+            ],
+            state="readonly",
+            width=45,
+            font=("Arial", 10)
+        )
+        tipo_doc_combo.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        row += 1
 
-        # Configurar expansión de columnas
-        form_frame.columnconfigure(1, weight=1)
+        # 2. IDENTIFICACIÓN (CÉDULA)
+        tk.Label(
+            form_frame,
+            text="Identificación: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
 
-        # Nota
-        ttk.Label(
-            main_frame,
-            text="* Campos obligatorios",
+        cedula_entry = ttk.Entry(form_frame, width=47, font=("Arial", 10))
+        if self.cedula_validada:
+            cedula_entry.insert(0, self.cedula_validada)
+            cedula_entry.config(state="disabled")
+        cedula_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        self.entries["cedula"] = cedula_entry
+        row += 1
+
+        # 3. NOMBRES
+        tk.Label(
+            form_frame,
+            text="Nombres: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+
+        nombres_entry = ttk.Entry(form_frame, width=47, font=("Arial", 10))
+        nombres_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        self.entries["nombres"] = nombres_entry
+        nombres_entry.focus()
+        row += 1
+
+        # 4. APELLIDOS
+        tk.Label(
+            form_frame,
+            text="Apellidos: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+
+        apellidos_entry = ttk.Entry(form_frame, width=47, font=("Arial", 10))
+        apellidos_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        self.entries["apellidos"] = apellidos_entry
+        row += 1
+
+        # 5. CELULAR (Opcional)
+        tk.Label(
+            form_frame,
+            text="Celular:",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+
+        celular_entry = ttk.Entry(form_frame, width=47, font=("Arial", 10))
+        celular_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        self.entries["celular"] = celular_entry
+        row += 1
+
+        # 6. CORREO
+        tk.Label(
+            form_frame,
+            text="Correo electrónico: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+
+        correo_entry = ttk.Entry(form_frame, width=47, font=("Arial", 10))
+        correo_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        self.entries["correo"] = correo_entry
+        row += 1
+
+        # 7. CONFIRMAR CORREO
+        tk.Label(
+            form_frame,
+            text="Confirmar correo electrónico: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+
+        confirmar_correo_entry = ttk.Entry(form_frame, width=47, font=("Arial", 10))
+        confirmar_correo_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
+        self.entries["confirmar_correo"] = confirmar_correo_entry
+        row += 1
+
+        # 8. CONTRASEÑA
+        tk.Label(
+            form_frame,
+            text="Contraseña: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+
+        password_entry = ttk.Entry(form_frame, show="●", width=47, font=("Arial", 10))
+        password_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 5))
+        self.entries["password"] = password_entry
+        row += 1
+
+        # Info de contraseña
+        tk.Label(
+            form_frame,
+            text="La contraseña deberá contener mínimo 6 y máximo 12 caracteres",
             font=("Arial", 8),
-            foreground="gray"
-        ).pack(pady=5)
+            bg="white",
+            fg="#4a5568",
+            justify=tk.LEFT
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 15))
+        row += 1
 
-        # Botones
-        buttons_frame = ttk.Frame(main_frame)
-        buttons_frame.pack(pady=15)
+        # 9. CONFIRMAR CONTRASEÑA
+        tk.Label(
+            form_frame,
+            text="Confirmar contraseña: *",
+            font=("Arial", 10),
+            bg="white",
+            anchor="w"
+        ).grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
 
-        ttk.Button(
+        confirmar_password_entry = ttk.Entry(form_frame, show="●", width=47, font=("Arial", 10))
+        confirmar_password_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 20))
+        self.entries["confirmar_password"] = confirmar_password_entry
+        row += 1
+
+        # Configurar expansión de columna
+        form_frame.columnconfigure(0, weight=1)
+
+        # BOTONES FINALES
+        buttons_frame = tk.Frame(form_frame, bg="white")
+        buttons_frame.grid(row=row, column=0, pady=20)
+
+        tk.Button(
             buttons_frame,
-            text=" Crear Cuenta",
+            text="✓ Crear Cuenta",
             command=self.crear_cuenta,
-            width=18
+            bg="#10b981",
+            fg="white",
+            font=("Arial", 11, "bold"),
+            relief=tk.FLAT,
+            padx=30,
+            pady=12,
+            cursor="hand2",
+            width=15
         ).grid(row=0, column=0, padx=5)
 
-        ttk.Button(
+        tk.Button(
             buttons_frame,
             text="✗ Cancelar",
             command=self.root.destroy,
-            width=18
+            bg="#6b7280",
+            fg="white",
+            font=("Arial", 11, "bold"),
+            relief=tk.FLAT,
+            padx=30,
+            pady=12,
+            cursor="hand2",
+            width=15
         ).grid(row=0, column=1, padx=5)
+        
+        # Empacar canvas y scrollbar
+        main_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
     def crear_cuenta(self):
         """Procesa la creación de una nueva cuenta"""
         try:
             # Obtener valores
-            nombre = self.entries["Nombre"].get().strip()
-            apellidos = self.entries["Apellidos"].get().strip()
-            cedula = self.entries["Cedula"].get().strip()
-            celular = self.entries["Celular"].get().strip()
-            direccion = self.entries["Direccion"].get().strip()
-            correo = self.entries["Correo"].get().strip()
-            password = self.entries["Password"].get()
-            confirmar = self.entries["Confirmar"].get()
+            cedula = self.cedula_validada if self.cedula_validada else self.entries["cedula"].get().strip()
+            nombres = self.entries["nombres"].get().strip()
+            apellidos = self.entries["apellidos"].get().strip()
+            celular = self.entries["celular"].get().strip()
+            correo = self.entries["correo"].get().strip()
+            confirmar_correo = self.entries["confirmar_correo"].get().strip()
+            password = self.entries["password"].get()
+            confirmar_password = self.entries["confirmar_password"].get()
 
-            # Validaciones
-            if not all([nombre, apellidos, cedula, correo, password]):
+            # VALIDACIONES
+
+            # 1. Campos obligatorios
+            if not all([cedula, nombres, apellidos, correo, password]):
                 raise ValueError(
-                    "Complete todos los campos obligatorios:\n"
-                    "• Nombre\n"
+                    "Complete todos los campos obligatorios marcados con *:\n"
+                    "• Tipo de documento\n"
+                    "• Identificación\n"
+                    "• Nombres\n"
                     "• Apellidos\n"
-                    "• Cédula\n"
-                    "• Correo\n"
+                    "• Correo electrónico\n"
                     "• Contraseña"
                 )
 
-            if password != confirmar:
-                raise ValueError("Las contraseñas no coinciden")
+            # 2. Validar correos coincidan
+            if correo != confirmar_correo:
+                raise ValueError("Los correos electrónicos no coinciden")
 
-            if len(password) < 6:
-                raise ValueError("La contraseña debe tener al menos 6 caracteres")
-
-            # Validar formato de correo básico
-            if "@" not in correo or "." not in correo:
+            # 3. Validar formato de correo
+            if "@" not in correo or "." not in correo.split("@")[-1]:
                 raise ValueError("Formato de correo inválido")
 
-            # Validar que la cédula sea numérica
-            if not cedula.isdigit():
-                raise ValueError("La cédula debe contener solo números")
+            # 4. Validar contraseñas coincidan
+            if password != confirmar_password:
+                raise ValueError("Las contraseñas no coinciden")
 
-            if len(cedula) != 10:
+            # 5. Validar longitud de contraseña
+            if len(password) < 6 or len(password) > 12:
+                raise ValueError("La contraseña debe tener entre 6 y 12 caracteres")
+
+            # 6. Validar cédula
+            if not cedula.isdigit() or len(cedula) != 10:
                 raise ValueError("La cédula debe tener 10 dígitos")
 
-            # Verificar si el correo ya existe
+            # 7. Verificar si el correo ya existe
             if self.usuario_repo.buscar_por_correo(correo):
-                raise ValueError("Ya existe una cuenta con ese correo electrónico")
+                raise ValueError(
+                    "Ya existe una cuenta con ese correo electrónico.\n\n"
+                    "Si ya tiene cuenta, use la opción 'Iniciar Sesión'."
+                )
+            
+            # 8. Verificar si la cédula ya existe
+            if self.usuario_repo.existe_cedula(cedula):
+                raise ValueError(
+                    f"Ya existe una cuenta con la cédula {cedula}.\n\n"
+                    "Si ya tiene cuenta, use la opción 'Iniciar Sesión'."
+                )
 
-            # Crear datos personales
+            # CREAR USUARIO
+
+            # Crear datos personales (solo campos básicos)
             datos = DatosPersonales(
-                nombre=nombre,
+                nombre=nombres,
                 apellidos=apellidos,
                 cedula=cedula,
-                direccion=direccion,
-                celular=celular,
                 correo=correo,
-                etnia="",
+                celular=celular,
+                direccion="",  # Se puede completar después
+                etnia="",      # Se puede completar después
                 discapacidad=False
             )
 
@@ -161,17 +357,24 @@ class RegistroApp:
             # Guardar en el repositorio
             self.usuario_repo.agregar(postulante)
 
+            # CONFIRMACIÓN EXITOSA
             messagebox.showinfo(
-                " Cuenta Creada",
-                f"Cuenta creada exitosamente para:\n\n"
-                f"{nombre} {apellidos}\n"
-                f"Correo: {correo}\n\n"
-                f"Ya puede iniciar sesión con sus credenciales"
+                "✓ Cuenta Creada Exitosamente",
+                f"Su cuenta ha sido creada correctamente.\n\n"
+                f"📋 DATOS DE ACCESO:\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"Nombre: {nombres} {apellidos}\n"
+                f"Cédula: {cedula}\n"
+                f"Usuario: {correo}\n\n"
+                f"⚠️ IMPORTANTE:\n"
+                f"• Use su correo y contraseña para iniciar sesión\n"
+                f"• Guarde sus credenciales en un lugar seguro\n\n"
+                f"Cierre esta ventana para volver al inicio de sesión."
             )
             
             self.root.destroy()
 
         except ValueError as e:
-            messagebox.showerror("Error de Validación", str(e))
+            messagebox.showerror("❌ Error de Validación", str(e))
         except Exception as e:
-            messagebox.showerror("Error Inesperado", f"Ocurrió un error: {e}")
+            messagebox.showerror("❌ Error Inesperado", f"Ocurrió un error:\n{e}")

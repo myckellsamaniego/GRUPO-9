@@ -33,3 +33,14 @@ class Administrador(Usuario):
 
     def obtener_tipo(self) -> str:
         return "ADMIN"
+
+    def to_dict(self) -> dict:
+        """Convierte el administrador a diccionario para persistencia"""
+        return {
+            "tipo": "ADMIN",
+            "correo": self._correo,
+            "password": self._password,
+            "identificacion": self._identificacion,
+            "nombre": self._nombre,
+            "admin_id": self._admin_id
+        }

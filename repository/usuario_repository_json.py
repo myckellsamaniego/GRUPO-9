@@ -1,132 +1,190 @@
+"""
+Repositorio de Usuarios - Persistencia en JSON
+"""
 import json
 import os
-from repository.usuario_repository import UsuarioRepository
+from typing import List, Optional
 from factory.fabrica_usuarios import FabricaUsuarios
 
 
-class UsuarioRepositoryJSON(UsuarioRepository):
+class UsuarioRepositoryJSON:
     """
-    REPOSITORY CONCRETO (JSON)
-    Implementación del repositorio de usuarios con persistencia en JSON
+    Repositorio para gestionar usuarios del sistema
+    Almacena en archivo JSON
     """
 
-    def __init__(self, archivo="usuarios.json"):
-        self._archivo = archivo
-        self._fabrica = FabricaUsuarios()
+    def __init__(self, archivo: str = "data/usuarios.json"):
+        self.archivo = archivo
+        self.fabrica = FabricaUsuarios()
+        self._usuarios = []
+        self._cargar_desde_archivo()
 
-        if not os.path.exists(self._archivo):
-            self._crear_archivo_con_admin()
+    def _cargar_desde_archivo(self):
+        """Carga usuarios desde el archivo JSON"""
+        if not os.path.exists(self.archivo):
+            # Crear directorio si no existe
+            os.makedirs(os.path.dirname(self.archivo), exist_ok=True)
+            self._usuarios = []
+            return
+        
+        try:
+            with open(self.archivo, 'r', encoding='utf-8') as f:
+                datos = json.load(f)
+                self._usuarios = [
+                    self.fabrica.crear_desde_dict(d) 
+                    for d in datos
+                ]
+        except (FileNotFoundError, json.JSONDecodeError):
+            self._usuarios = []
 
-    def _leer(self):
-        """Lee el archivo JSON"""
-        with open(self._archivo, "r", encoding='utf-8') as f:
-            return json.load(f)
+    def _guardar_en_archivo(self):
+        """Guarda usuarios en el archivo JSON"""
+        os.makedirs(os.path.dirname(self.archivo), exist_ok=True)
+        
+        datos = []
+        for usuario in self._usuarios:
+            if hasattr(usuario, 'to_dict'):
+                datos.append(usuario.to_dict())
+            else:
+                # Si no tiene to_dict, construir manualmente
+                if usuario.obtener_tipo() == "ADMIN":
+                    datos.append({
+                        "tipo": "ADMIN",
+                        "correo": usuario.correo,
+                        "password": usuario.password,
+                        "identificacion": usuario.identificacion,
+                        "nombre": usuario.nombre,
+                        "admin_id": usuario.admin_id
+                    })
+                else:  # Postulante
+                    datos.append({
+                        "tipo": "POSTULANTE",
+                        "correo": usuario.correo,
+                        "password": usuario.password,
+                        "datos_personales": usuario.datos_personales.to_dict()
+                    })
+        
+        with open(self.archivo, 'w', encoding='utf-8') as f:
+            json.dump(datos, f, indent=2, ensure_ascii=False)
 
-    def _guardar(self, data):
-        """Guarda datos en el archivo JSON"""
-        with open(self._archivo, "w", encoding='utf-8') as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-
-    def agregar(self, usuario):
+    def agregar(self, usuario) -> None:
         """
-        Agrega un nuevo usuario al sistema
+        Agrega un usuario al repositorio
         
         Args:
-            usuario: Instancia de Usuario (Postulante o Administrador)
-            
-        Raises:
-            ValueError: Si el usuario ya existe
+            usuario: Usuario a agregar (Postulante o Administrador)
         """
-        usuarios = self._leer()
+        # Verificar que no exista el correo
+        if self.buscar_por_correo(usuario.correo):
+            raise ValueError(f"Ya existe un usuario con el correo {usuario.correo}")
+        
+        self._usuarios.append(usuario)
+        self._guardar_en_archivo()
 
-        # Verificar si el correo ya existe
-        if any(u["correo"] == usuario.correo for u in usuarios):
-            raise ValueError("El usuario ya existe")
-
-        usuarios.append(self._usuario_a_dict(usuario))
-        self._guardar(usuarios)
-
-    def buscar_por_correo(self, correo):
+    def buscar_por_correo(self, correo: str):
         """
         Busca un usuario por su correo electrónico
         
         Args:
-            correo: Correo electrónico del usuario
+            correo: Correo del usuario
             
         Returns:
-            Instancia de Usuario o None si no existe
+            Usuario encontrado o None
         """
-        usuarios = self._leer()
-
-        for u in usuarios:
-            if u["correo"] == correo:
-                return self._fabrica.crear_desde_dict(u)
-
+        for usuario in self._usuarios:
+            if usuario.correo == correo:
+                return usuario
         return None
 
-    def listar(self):
+    def buscar_por_cedula(self, cedula: str):
         """
-        Lista todos los usuarios del sistema
-        
-        Returns:
-            Lista de instancias de Usuario
-        """
-        return [
-            self._fabrica.crear_desde_dict(u)
-            for u in self._leer()
-        ]
-
-    def _usuario_a_dict(self, usuario):
-        """
-        Convierte un usuario a diccionario para persistencia
+        Busca un postulante por su cédula
         
         Args:
-            usuario: Instancia de Usuario
+            cedula: Cédula del postulante
             
         Returns:
-            Diccionario con los datos del usuario
-            
-        Raises:
-            ValueError: Si el tipo de usuario no es soportado
+            Postulante encontrado o None
         """
-        tipo = usuario.obtener_tipo()
+        for usuario in self._usuarios:
+            if usuario.obtener_tipo() == "POSTULANTE":
+                if usuario.datos_personales.cedula == cedula:
+                    return usuario
+        return None
+
+    def listar_todos(self) -> List:
+        """
+        Retorna todos los usuarios
         
-        if tipo == "ADMIN":
-            return {
-                "tipo": "ADMIN",
-                "identificacion": usuario.identificacion,
-                "nombre": usuario.nombre,
-                "correo": usuario.correo,
-                "password": usuario.password,
-                "admin_id": usuario.admin_id
-            }
-
-        elif tipo == "Postulante":
-            return {
-                "tipo": "POSTULANTE",
-                "correo": usuario.correo,
-                "password": usuario.password,
-                "datos_personales": usuario.datos_personales.to_dict()
-            }
-
-        else:
-            raise ValueError(f"Tipo de usuario no soportado: {tipo}")
-    
-    def _crear_archivo_con_admin(self):
+        Returns:
+            Lista de usuarios
         """
-        Inicializa el sistema con un administrador por defecto.
-        Esto simula un sistema real donde el admin ya existe.
+        return list(self._usuarios)
+
+    def listar_postulantes(self) -> List:
         """
-        admin_inicial = [
-            {
-                "tipo": "ADMIN",
-                "identificacion": "ADM001",
-                "nombre": "Administrador Principal",
-                "correo": "admin@uleam.edu.ec",
-                "password": "admin123",
-                "admin_id": "ADMIN-001"
-            }
+        Retorna solo los postulantes
+        
+        Returns:
+            Lista de postulantes
+        """
+        return [
+            u for u in self._usuarios 
+            if u.obtener_tipo() == "POSTULANTE"
         ]
 
-        with open(self._archivo, "w", encoding='utf-8') as f:
-            json.dump(admin_inicial, f, indent=4, ensure_ascii=False)
+    def listar_administradores(self) -> List:
+        """
+        Retorna solo los administradores
+        
+        Returns:
+            Lista de administradores
+        """
+        return [
+            u for u in self._usuarios 
+            if u.obtener_tipo() == "ADMIN"
+        ]
+
+    def actualizar(self, usuario) -> None:
+        """
+        Actualiza un usuario existente
+        
+        Args:
+            usuario: Usuario con datos actualizados
+        """
+        for i, u in enumerate(self._usuarios):
+            if u.correo == usuario.correo:
+                self._usuarios[i] = usuario
+                self._guardar_en_archivo()
+                return
+        
+        raise ValueError(f"Usuario {usuario.correo} no encontrado")
+
+    def eliminar(self, correo: str) -> bool:
+        """
+        Elimina un usuario por su correo
+        
+        Args:
+            correo: Correo del usuario a eliminar
+            
+        Returns:
+            True si se eliminó, False si no se encontró
+        """
+        for i, u in enumerate(self._usuarios):
+            if u.correo == correo:
+                self._usuarios.pop(i)
+                self._guardar_en_archivo()
+                return True
+        return False
+
+    def existe_cedula(self, cedula: str) -> bool:
+        """
+        Verifica si existe un postulante con esa cédula
+        
+        Args:
+            cedula: Cédula a verificar
+            
+        Returns:
+            True si existe, False en caso contrario
+        """
+        return self.buscar_por_cedula(cedula) is not None
