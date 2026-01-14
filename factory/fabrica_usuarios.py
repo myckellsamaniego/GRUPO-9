@@ -1,21 +1,41 @@
 from models.postulante import Postulante
 from models.administrador import Administrador
+from models.datos_personales import DatosPersonales
+
 
 class FabricaUsuarios:
     """
     FACTORY METHOD:
     Centraliza la creación de usuarios del sistema.
-
-    - crear_usuario(): creación desde GUI (registro)
-    - crear_desde_dict(): reconstrucción desde JSON
+    
+    Métodos:
+    - crear_usuario(): Creación desde GUI (registro)
+    - crear_desde_dict(): Reconstrucción desde JSON
     """
 
-    # creación normal (GUI, registro) 
     def crear_usuario(self, tipo_usuario: str, **kwargs):
-
+        """
+        Crea un usuario desde la interfaz de usuario
+        
+        Args:
+            tipo_usuario: "Postulante" o "Administrador"
+            **kwargs: Parámetros necesarios para crear el usuario
+            
+        Returns:
+            Instancia de Usuario (Postulante o Administrador)
+            
+        Raises:
+            ValueError: Si el tipo de usuario no es válido
+        """
+        
         if tipo_usuario == "Postulante":
+            # El correo puede venir explícitamente o desde datos_personales
+            correo = kwargs.get("correo")
+            if not correo and "datos_personales" in kwargs:
+                correo = kwargs["datos_personales"].correo
+            
             return Postulante(
-                correo=kwargs["correo"],
+                correo=correo,
                 password=kwargs["password"],
                 datos_personales=kwargs["datos_personales"]
             )
@@ -32,9 +52,20 @@ class FabricaUsuarios:
         else:
             raise ValueError(f"Tipo de usuario no válido: '{tipo_usuario}'")
 
-    #  construcción desde persistencia 
     def crear_desde_dict(self, data: dict):
-
+        """
+        Reconstruye un usuario desde datos JSON
+        
+        Args:
+            data: Diccionario con los datos del usuario
+            
+        Returns:
+            Instancia de Usuario reconstruida
+            
+        Raises:
+            ValueError: Si el tipo de usuario es desconocido
+        """
+        
         if data["tipo"] == "ADMIN":
             return Administrador(
                 identificacion=data["identificacion"],
@@ -45,11 +76,14 @@ class FabricaUsuarios:
             )
 
         elif data["tipo"] == "POSTULANTE":
+            # Reconstruir datos personales desde el diccionario
+            datos_personales = DatosPersonales.from_dict(data["datos_personales"])
+            
             return Postulante(
                 correo=data["correo"],
                 password=data["password"],
-                datos_personales=None  # se reconstruyen después
+                datos_personales=datos_personales
             )
 
         else:
-            raise ValueError("Tipo de usuario desconocido en persistencia")
+            raise ValueError(f"Tipo de usuario desconocido en persistencia: {data['tipo']}")

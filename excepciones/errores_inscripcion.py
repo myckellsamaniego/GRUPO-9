@@ -1,3 +1,7 @@
+"""
+Excepciones personalizadas para el proceso de inscripción
+"""
+
 class InscripcionError(Exception):
     """Error base del proceso de inscripción"""
     pass
@@ -9,22 +13,20 @@ class InscripcionDuplicadaError(InscripcionError):
 
 
 class CuposAgotadosError(InscripcionError):
-    """No existen cupos disponibles en la oferta"""
+    """No existen cupos disponibles en la oferta académica"""
     pass
 
 
 class DatosIncompletosError(InscripcionError):
-    """Faltan datos personales obligatorios"""
+    """Faltan datos personales obligatorios del postulante"""
     pass
 
-class ErrorDatosIncompletos(Exception):
-    """
-    Se lanza cuando el postulante no ha completado sus datos personales.
-    """
+
+class CuposNoDisponiblesError(InscripcionError):
+    """No hay cupos disponibles en la sede o periodo seleccionado"""
     pass
 
-class ErrorCuposNoDisponibles(Exception):
-    """
-    Se lanza cuando la oferta académica no tiene cupos disponibles.
-    """
+
+class OfertaNoDisponibleError(InscripcionError):
+    """La oferta académica no está disponible para inscripción"""
     pass
