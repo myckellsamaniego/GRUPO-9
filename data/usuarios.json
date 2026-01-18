@@ -6,5 +6,20 @@
     "identificacion": "1234567890",
     "nombre": "Administrador del Sistema",
     "admin_id": "ADMIN001"
+  },
+  {
+    "tipo": "POSTULANTE",
+    "correo": "yulia@gmail.com",
+    "password": "yulia123",
+    "datos_personales": {
+      "nombre": "yulia",
+      "apellidos": "flores muentes",
+      "cedula": "1315237832",
+      "direccion": "",
+      "celular": "0987654321",
+      "correo": "yulia@gmail.com",
+      "etnia": "",
+      "discapacidad": false
+    }
   }
 ]

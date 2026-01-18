@@ -357,26 +357,10 @@ class LoginMejoradoApp:
         password_entry = ttk.Entry(form_frame, show="●", width=35, font=("Arial", 11))
         password_entry.pack(pady=(0, 20))
         
-        # Info admin
+        # Info admin (comentado)
         info_frame = tk.Frame(form_frame, bg="#eff6ff", relief=tk.SOLID, borderwidth=1)
         info_frame.pack(fill=tk.X, pady=(0, 20))
-        
-        #tk.Label(
-        #    info_frame,
-        #    text="💡 Credenciales de Administrador:",
-        #    font=("Arial", 9, "bold"),
-        #    bg="#eff6ff",
-        #    fg="#1e40af"
-        #).pack(pady=(5, 2))
-        
-        #tk.Label(
-        #    info_frame,
-        #    text="admin@uleam.edu.ec / admin123",
-        #    font=("Arial", 9),
-        #    bg="#eff6ff",
-        #    fg="#6b7280"
-        #).pack(pady=(0, 5))
-        
+
         # Botones
         btn_frame = tk.Frame(form_frame, bg="white")
         btn_frame.pack()
@@ -404,7 +388,9 @@ class LoginMejoradoApp:
                 if usuario.obtener_tipo() == "ADMIN":
                     AdminApp(root, usuario)
                 else:
-                    PostulanteApp(root, usuario)
+                    # *** AQUÍ ESTÁ EL CAMBIO CRÍTICO ***
+                    # Pasar el usuario_repo al PostulanteApp
+                    PostulanteApp(root, usuario, self.usuario_repo)
                 root.mainloop()
                 
             except ValueError as e:
