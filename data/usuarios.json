@@ -21,5 +21,40 @@
       "etnia": "",
       "discapacidad": false
     }
+  },
+  {
+    "tipo": "POSTULANTE",
+    "correo": "hoover@gmail.com",
+    "password": "123456",
+    "datos_personales": {
+      "nombre": "Hoover",
+      "apellidos": "Samaniego Arambulo",
+      "cedula": "0801649666",
+      "fecha_nacimiento": "1999-01-01",
+      "estado_civil": "Casado/a",
+      "sexo": "Masculino",
+      "identidad_genero": "Hombre",
+      "correo": "hoover@gmail.com",
+      "celular": "0987654321",
+      "provincia": "Manabí",
+      "canton": "Manta",
+      "parroquia": "Tarqui",
+      "barrio": "La Paz",
+      "calle_principal": "Calle 16",
+      "calle_secundaria": "Avenida 21",
+      "numero_casa": "122",
+      "direccion": "Calle 16 y Avenida 21 #122 - La Paz",
+      "etnia": "Afroecuatoriano/a",
+      "discapacidad": true,
+      "requiere_apoyo_evaluacion": false,
+      "internet_domicilio": true,
+      "computadora_funcional": true,
+      "sistema_operativo": "Windows",
+      "camara_web": true,
+      "orientacion_vocacional": false,
+      "institucion_aspirar": "Universidad Laica Eloy Alfaro de Manabí - ULEAM",
+      "nivel_maximo_estudios": "Bachillerato",
+      "razon_estudiar_carrera": "Superarme"
+    }
   }
 ]

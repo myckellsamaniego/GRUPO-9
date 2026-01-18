@@ -334,7 +334,16 @@ class FormularioCompletoApp:
         estado_civil.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
         self.entries_paso1['estado_civil'] = estado_civil
         row += 1
-
+        
+        # Sexo
+        tk.Label(form_frame, text="Sexo: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        row += 1
+        sexo_frame = tk.Frame(form_frame, bg="white")
+        sexo_frame.grid(row=row, column=0, sticky=tk.W, pady=(0, 15))
+        self.sexo_var = tk.StringVar(value="")
+        tk.Radiobutton(sexo_frame, text="Masculino", variable=self.sexo_var, value="Masculino", bg="white", font=("Arial", 10)).pack(side=tk.LEFT, padx=(0, 20))
+        tk.Radiobutton(sexo_frame, text="Femenino", variable=self.sexo_var, value="Femenino", bg="white", font=("Arial", 10)).pack(side=tk.LEFT)
+        row += 1
         
         # Identidad de género
         tk.Label(form_frame, text="Tipo de identidad de género: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
@@ -1027,6 +1036,7 @@ class FormularioCompletoApp:
             )
             
             if self.postulante_existente:
+                password_actual = self.postulante_existente.password
                 # Actualizar postulante existente
                 postulante_actualizado = self.fabrica.crear_usuario(
                     "Postulante",
@@ -1046,6 +1056,7 @@ class FormularioCompletoApp:
                 )
             else:
                 # Crear nuevo postulante
+                password = self.datos_formulario['paso2'].get('password', 'temp123')
                 postulante = self.fabrica.crear_usuario(
                     "Postulante",
                     correo=self.datos_formulario['paso2']['correo'],
@@ -1070,4 +1081,11 @@ class FormularioCompletoApp:
             self.root.destroy()
             
         except Exception as e:
-            messagebox.showerror("Error", f"No se pudo completar el registro:\n{e}")
+            messagebox.showerror(
+                "Error", 
+                f"No se pudo completar el registro:\n\n{str(e)}\n\n"
+                f"Por favor, revise que todos los campos estén completos."
+            )
+            print(f"Error detallado: {e}")
+            import traceback
+            traceback.print_exc()

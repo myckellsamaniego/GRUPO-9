@@ -117,7 +117,6 @@ class PostulanteApp:
         # Obtener cédula del postulante
         cedula = self.postulante.datos_personales.cedula
         
-        # VERIFICAR QUE EL REPOSITORIO EXISTA
         if not self.usuario_repo:
             messagebox.showerror(
                 "Error",
@@ -125,12 +124,11 @@ class PostulanteApp:
                 "Por favor, reinicie la aplicación."
             )
             return
-        
         # Crear ventana del formulario
         formulario_window = tk.Toplevel(self.root)
         FormularioCompletoApp(
             formulario_window, 
-            self.usuario_repo,  # Pasar el repositorio
+            self.usuario_repo, 
             cedula_validada=cedula,
             postulante_existente=self.postulante
         )
