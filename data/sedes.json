@@ -1,0 +1,26 @@
+[
+  {
+    "nombre": "Campus Manta",
+    "direccion": "Av. Circunvalación, Vía San Mateo",
+    "ciudad": "Manta",
+    "capacidad": 500
+  },
+  {
+    "nombre": "Campus Chone",
+    "direccion": "Av. Universitaria",
+    "ciudad": "Chone",
+    "capacidad": 300
+  },
+  {
+    "nombre": "Campus Bahía",
+    "direccion": "Calle Principal s/n",
+    "ciudad": "Bahía de Caráquez",
+    "capacidad": 200
+  },
+  {
+    "nombre": "Campus Pedernales",
+    "direccion": "Av. Central",
+    "ciudad": "Pedernales",
+    "capacidad": 150
+  }
+]

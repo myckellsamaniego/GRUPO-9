@@ -5,7 +5,7 @@ Sistema de Admisión ULEAM 2026
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from gui.app_admin import AdminApp
+from gui.app_admin import AdminAppMejorado
 from gui.app_postulante import PostulanteApp
 from gui.registro import RegistroApp
 
@@ -402,7 +402,8 @@ class LoginMejoradoApp:
                 # Abrir app correspondiente
                 root = tk.Tk()
                 if usuario.obtener_tipo() == "ADMIN":
-                    AdminApp(root, usuario)
+                    from gui.app_admin import AdminAppMejorado
+                    AdminAppMejorado(root, usuario)
                 else:
                     PostulanteApp(root, usuario, self.usuario_repo)
                 root.mainloop()
