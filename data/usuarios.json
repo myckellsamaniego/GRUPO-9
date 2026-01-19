@@ -56,5 +56,40 @@
       "nivel_maximo_estudios": "Bachillerato",
       "razon_estudiar_carrera": "Superarme"
     }
+  },
+  {
+    "tipo": "POSTULANTE",
+    "correo": "andrea@gmail.com",
+    "password": "andrea123",
+    "datos_personales": {
+      "nombre": "Andrea Sofía",
+      "apellidos": "Castillo Vera",
+      "cedula": "0923456789",
+      "fecha_nacimiento": "2001-07-23",
+      "estado_civil": "Unión libre",
+      "sexo": "",
+      "identidad_genero": "Mujer",
+      "correo": "andrea@gmail.com",
+      "celular": "andrea@gmail.com",
+      "provincia": "Manabí",
+      "canton": "Pedernales",
+      "parroquia": "San lucas",
+      "barrio": "La Pradera",
+      "calle_principal": "Calle123",
+      "calle_secundaria": "Avenida 2",
+      "numero_casa": "1",
+      "direccion": "Calle123 y Avenida 2 #1 - La Pradera",
+      "etnia": "Montubio/a",
+      "discapacidad": true,
+      "requiere_apoyo_evaluacion": false,
+      "internet_domicilio": false,
+      "computadora_funcional": true,
+      "sistema_operativo": "Linux",
+      "camara_web": true,
+      "orientacion_vocacional": false,
+      "institucion_aspirar": "Campus Bahía - Bahía de Caráquez",
+      "nivel_maximo_estudios": "Bachillerato",
+      "razon_estudiar_carrera": ""
+    }
   }
 ]

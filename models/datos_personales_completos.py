@@ -12,17 +12,21 @@ class DatosPersonalesCompletos:
     
     def __init__(
         self,
-        # PASO 1: Identificación
+        # PASO 1: Identificación (campos obligatorios)
         nombre: str,
         apellidos: str,
         cedula: str,
         fecha_nacimiento: date,
         estado_civil: str,
-        sexo: str,
         identidad_genero: str,
         
-        # PASO 2: Referencia-Contactos
+        # PASO 2: Referencia-Contactos (campo obligatorio)
         correo: str,
+        
+        # PASO 1: Identificación (campos opcionales)
+        sexo: str = "",
+        
+        # PASO 2: Referencia-Contactos (campos opcionales)
         celular: str = "",
         provincia: str = "",
         canton: str = "",
@@ -98,7 +102,7 @@ class DatosPersonalesCompletos:
         self._nivel_maximo_estudios = nivel_maximo_estudios
         self._razon_estudiar_carrera = razon_estudiar_carrera
     
-    # ========== PROPIEDADES ==========
+    #  PROPIEDADES 
     
     # Paso 1
     @property
@@ -228,7 +232,7 @@ class DatosPersonalesCompletos:
     def razon_estudiar_carrera(self):
         return self._razon_estudiar_carrera
     
-    # ========== MÉTODOS ==========
+    #  MÉTODOS 
     
     def datos_obligatorios_completos(self) -> bool:
         """Verifica que los datos obligatorios estén completos"""
@@ -239,7 +243,7 @@ class DatosPersonalesCompletos:
             self._correo,
             self._fecha_nacimiento,
             self._estado_civil,
-            self._sexo
+            self._identidad_genero  
         ])
     
     def to_dict(self) -> dict:

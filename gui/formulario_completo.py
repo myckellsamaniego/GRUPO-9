@@ -2,7 +2,7 @@
 """
 Formulario de Registro Completo Multi-Paso
 Similar al Sistema Nacional de Nivelación y Admisión
-ACTUALIZADO: Ahora puede usarse para completar perfil de postulantes existentes
+ACTUALIZADO: Nombres y apellidos bloqueados, sin campo "Sexo"
 """
 import tkinter as tk
 from tkinter import messagebox, ttk
@@ -11,6 +11,7 @@ from datetime import datetime
 
 from models.datos_personales_completos import DatosPersonalesCompletos
 from factory.fabrica_usuarios import FabricaUsuarios
+from repository.sede_repository import SedeRepositoryJSON
 
 
 class FormularioCompletoApp:
@@ -20,6 +21,7 @@ class FormularioCompletoApp:
         self.root = root
         self.usuario_repo = usuario_repo
         self.fabrica = FabricaUsuarios()
+        self.sede_repo = SedeRepositoryJSON()  # ✅ AGREGADO: Repositorio de sedes
         self.cedula_validada = cedula_validada
         self.postulante_existente = postulante_existente
         
@@ -51,7 +53,9 @@ class FormularioCompletoApp:
         """Pre-carga los datos básicos del postulante existente"""
         datos = self.postulante_existente.datos_personales
         
-        # Pre-cargar correo y otros datos básicos si existen
+        # Pre-cargar TODOS los datos básicos disponibles
+        self.datos_formulario['paso1']['nombres'] = datos.nombre if hasattr(datos, 'nombre') else ""
+        self.datos_formulario['paso1']['apellidos'] = datos.apellidos if hasattr(datos, 'apellidos') else ""
         self.datos_formulario['paso2']['correo'] = datos.correo if hasattr(datos, 'correo') else ""
         self.datos_formulario['paso2']['celular'] = datos.celular if hasattr(datos, 'celular') else ""
 
@@ -251,7 +255,7 @@ class FormularioCompletoApp:
             self.crear_paso6_educacion()
     
     def crear_paso1_identificacion(self):
-        """Paso 1: Información Personal e Identificación"""
+        """Paso 1: Información Personal e Identificación (SIN CAMPO SEXO)"""
         canvas = tk.Canvas(self.contenedor, bg="white")
         scrollbar = ttk.Scrollbar(self.contenedor, orient="vertical", command=canvas.yview)
         scrollable_frame = tk.Frame(canvas, bg="white")
@@ -292,30 +296,43 @@ class FormularioCompletoApp:
         self.entries_paso1['cedula'] = cedula_entry
         row += 1
         
-        # Nombre completo (calculado)
+        # Nombre completo (calculado automáticamente)
         tk.Label(form_frame, text="Nombre completo:", font=("Arial", 10), bg="white", fg="#6b7280").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
         row += 1
         self.nombre_completo_label = ttk.Label(form_frame, text="", font=("Arial", 10), background="white")
         self.nombre_completo_label.grid(row=row, column=0, sticky=tk.W, pady=(0, 15))
         row += 1
         
-        # Apellidos
+        # Apellidos - BLOQUEADOS si ya existen
         tk.Label(form_frame, text="Apellidos: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
         row += 1
         apellidos_entry = ttk.Entry(form_frame, width=50, font=("Arial", 10))
+        if self.postulante_existente:
+            apellidos_valor = self.datos_formulario['paso1'].get('apellidos', '')
+            if apellidos_valor:
+                apellidos_entry.insert(0, apellidos_valor)
+                apellidos_entry.config(state="disabled")
         apellidos_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
         apellidos_entry.bind("<KeyRelease>", self.actualizar_nombre_completo)
         self.entries_paso1['apellidos'] = apellidos_entry
         row += 1
         
-        # Nombres
+        # Nombres - BLOQUEADOS si ya existen
         tk.Label(form_frame, text="Nombres: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
         row += 1
         nombres_entry = ttk.Entry(form_frame, width=50, font=("Arial", 10))
+        if self.postulante_existente:
+            nombres_valor = self.datos_formulario['paso1'].get('nombres', '')
+            if nombres_valor:
+                nombres_entry.insert(0, nombres_valor)
+                nombres_entry.config(state="disabled")
         nombres_entry.grid(row=row, column=0, sticky=tk.EW, pady=(0, 15))
         nombres_entry.bind("<KeyRelease>", self.actualizar_nombre_completo)
         self.entries_paso1['nombres'] = nombres_entry
         row += 1
+        
+        # Actualizar nombre completo si ya hay datos
+        self.actualizar_nombre_completo()
         
         # Fecha de nacimiento
         tk.Label(form_frame, text="Fecha de nacimiento: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
@@ -335,21 +352,13 @@ class FormularioCompletoApp:
         self.entries_paso1['estado_civil'] = estado_civil
         row += 1
         
-        # Sexo
-        tk.Label(form_frame, text="Sexo: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
-        row += 1
-        sexo_frame = tk.Frame(form_frame, bg="white")
-        sexo_frame.grid(row=row, column=0, sticky=tk.W, pady=(0, 15))
-        self.sexo_var = tk.StringVar(value="")
-        tk.Radiobutton(sexo_frame, text="Masculino", variable=self.sexo_var, value="Masculino", bg="white", font=("Arial", 10)).pack(side=tk.LEFT, padx=(0, 20))
-        tk.Radiobutton(sexo_frame, text="Femenino", variable=self.sexo_var, value="Femenino", bg="white", font=("Arial", 10)).pack(side=tk.LEFT)
-        row += 1
+        # ===== ELIMINADO EL CAMPO "SEXO" =====
         
-        # Identidad de género
-        tk.Label(form_frame, text="Tipo de identidad de género: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
+        # Identidad de género (ahora es el único campo de género)
+        tk.Label(form_frame, text="Identidad de género: *", font=("Arial", 10, "bold"), bg="white", fg="#1e40af").grid(row=row, column=0, sticky=tk.W, pady=(0, 5))
         row += 1
         identidad_genero = ttk.Combobox(form_frame, width=47, font=("Arial", 10), state="readonly",
-                                        values=["Hombre", "Mujer", "Transgénero", "Prefiero no decirlo", "Otro"])
+                                        values=["Hombre", "Mujer", "Transgénero", "No binario", "Prefiero no decirlo", "Otro"])
         identidad_genero.grid(row=row, column=0, sticky=tk.EW, pady=(0, 20))
         self.entries_paso1['identidad_genero'] = identidad_genero
         
@@ -834,14 +843,31 @@ class FormularioCompletoApp:
         # Institución a la que aspira
         tk.Label(
             form_frame,
-            text="Institución a la que aspira ingresar:",
-            font=("Arial", 11),
-            bg="white"
+            text="Institución/Sede a la que aspira ingresar: *",
+            font=("Arial", 11, "bold"),
+            bg="white",
+            fg="#1e40af"
         ).pack(pady=(20, 10), anchor=tk.W)
         
-        self.institucion_entry = ttk.Entry(form_frame, width=50, font=("Arial", 10))
-        self.institucion_entry.insert(0, "Universidad Laica Eloy Alfaro de Manabí - ULEAM")
-        self.institucion_entry.pack(pady=5, anchor=tk.W)
+        # ✅ CAMBIADO: Ahora es un combobox con las sedes del repositorio
+        sedes = self.sede_repo.listar_todas()
+        nombres_sedes = [f"{sede.nombre} - {sede.ciudad}" for sede in sedes]
+        
+        if not nombres_sedes:
+            nombres_sedes = ["No hay sedes disponibles"]
+        
+        self.institucion_combo = ttk.Combobox(
+            form_frame,
+            values=nombres_sedes,
+            state="readonly",
+            width=47,
+            font=("Arial", 10)
+        )
+        self.institucion_combo.pack(pady=5, anchor=tk.W)
+        
+        # Seleccionar la primera opción por defecto
+        if nombres_sedes and nombres_sedes[0] != "No hay sedes disponibles":
+            self.institucion_combo.current(0)
         
         # Nivel máximo de estudios
         tk.Label(
@@ -877,15 +903,16 @@ class FormularioCompletoApp:
     def validar_paso_actual(self):
         """Valida que el paso actual esté completo"""
         if self.paso_actual == 0:
-            # Paso 1: Identificación
-            if not self.entries_paso1['nombres'].get().strip():
+            # Paso 1: Identificación (sin sexo)
+            nombres = self.entries_paso1['nombres'].get().strip()
+            apellidos = self.entries_paso1['apellidos'].get().strip()
+            
+            if not nombres:
                 raise ValueError("Debe ingresar sus nombres")
-            if not self.entries_paso1['apellidos'].get().strip():
+            if not apellidos:
                 raise ValueError("Debe ingresar sus apellidos")
             if not self.entries_paso1['estado_civil'].get():
                 raise ValueError("Debe seleccionar su estado civil")
-            if not self.sexo_var.get():
-                raise ValueError("Debe seleccionar su sexo")
             if not self.entries_paso1['identidad_genero'].get():
                 raise ValueError("Debe seleccionar su identidad de género")
                 
@@ -902,6 +929,12 @@ class FormularioCompletoApp:
             # Paso 3: Etnia
             if not self.etnia_var.get():
                 raise ValueError("Debe seleccionar una opción de autoidentificación étnica")
+        
+        elif self.paso_actual == 5:
+            # Paso 6: Educación - Validar sede
+            sede_seleccionada = self.institucion_combo.get()
+            if not sede_seleccionada or sede_seleccionada == "No hay sedes disponibles":
+                raise ValueError("Debe seleccionar una institución/sede")
 
     def guardar_datos_paso(self):
         """Guarda los datos del paso actual"""
@@ -912,7 +945,7 @@ class FormularioCompletoApp:
                 'apellidos': self.entries_paso1['apellidos'].get().strip(),
                 'fecha_nacimiento': self.entries_paso1['fecha_nacimiento'].get_date(),
                 'estado_civil': self.entries_paso1['estado_civil'].get(),
-                'sexo': self.sexo_var.get(),
+                # Ya no guardamos 'sexo'
                 'identidad_genero': self.entries_paso1['identidad_genero'].get()
             }
         elif self.paso_actual == 1:
@@ -946,7 +979,7 @@ class FormularioCompletoApp:
         elif self.paso_actual == 5:
             self.datos_formulario['paso6'] = {
                 'orientacion_vocacional': self.orientacion_var.get(),
-                'institucion': self.institucion_entry.get().strip(),
+                'institucion': self.institucion_combo.get(),  # ✅ CAMBIADO: obtener de combo
                 'nivel_estudios': self.nivel_combo.get(),
                 'razon_carrera': self.razon_text.get("1.0", tk.END).strip()
             }
@@ -994,6 +1027,7 @@ class FormularioCompletoApp:
     def finalizar_registro(self):
         """Procesa el registro completo del usuario"""
         try:
+            # Crear datos personales completos (SIN campo sexo)
             datos = DatosPersonalesCompletos(
                 # Paso 1
                 nombre=self.datos_formulario['paso1']['nombres'],
@@ -1001,19 +1035,19 @@ class FormularioCompletoApp:
                 cedula=self.datos_formulario['paso1']['cedula'],
                 fecha_nacimiento=self.datos_formulario['paso1']['fecha_nacimiento'],
                 estado_civil=self.datos_formulario['paso1']['estado_civil'],
-                sexo=self.datos_formulario['paso1']['sexo'],
+                sexo="",  # Dejar vacío o usar el mismo valor que identidad_genero
                 identidad_genero=self.datos_formulario['paso1']['identidad_genero'],
                 
                 # Paso 2
                 correo=self.datos_formulario['paso2']['correo'],
                 celular=self.datos_formulario['paso2']['celular'],
-                provincia=self.datos_formulario['paso2']['provincia'],
-                canton=self.datos_formulario['paso2']['canton'],
-                parroquia=self.datos_formulario['paso2']['parroquia'],
-                barrio=self.datos_formulario['paso2']['barrio'],
-                calle_principal=self.datos_formulario['paso2']['calle_principal'],
-                calle_secundaria=self.datos_formulario['paso2']['calle_secundaria'],
-                numero_casa=self.datos_formulario['paso2']['numero_casa'],
+                provincia=self.datos_formulario['paso2'].get('provincia', ''),
+                canton=self.datos_formulario['paso2'].get('canton', ''),
+                parroquia=self.datos_formulario['paso2'].get('parroquia', ''),
+                barrio=self.datos_formulario['paso2'].get('barrio', ''),
+                calle_principal=self.datos_formulario['paso2'].get('calle_principal', ''),
+                calle_secundaria=self.datos_formulario['paso2'].get('calle_secundaria', ''),
+                numero_casa=self.datos_formulario['paso2'].get('numero_casa', ''),
                 
                 # Paso 3
                 etnia=self.datos_formulario['paso3']['etnia'],
@@ -1036,38 +1070,41 @@ class FormularioCompletoApp:
             )
             
             if self.postulante_existente:
+                # ACTUALIZAR POSTULANTE EXISTENTE
                 password_actual = self.postulante_existente.password
-                # Actualizar postulante existente
+                
                 postulante_actualizado = self.fabrica.crear_usuario(
                     "Postulante",
                     correo=self.datos_formulario['paso2']['correo'],
-                    password=self.postulante_existente.password,
+                    password=password_actual,
                     datos_personales=datos
                 )
                 
                 self.usuario_repo.actualizar(postulante_actualizado)
                 
                 messagebox.showinfo(
-                    "✓ Perfil Completado",
+                    "✅ Perfil Completado",
                     f"¡Su perfil ha sido completado exitosamente!\n\n"
                     f"Nombre: {datos.nombre} {datos.apellidos}\n"
                     f"Cédula: {datos.cedula}\n\n"
-                    f"✓ Ya puede acceder a todas las funcionalidades"
+                    f"✓ Ya puede acceder a todas las funcionalidades\n\n"
+                    f"Cierre esta ventana para continuar."
                 )
             else:
-                # Crear nuevo postulante
+                # CREAR NUEVO POSTULANTE
                 password = self.datos_formulario['paso2'].get('password', 'temp123')
+                
                 postulante = self.fabrica.crear_usuario(
                     "Postulante",
                     correo=self.datos_formulario['paso2']['correo'],
-                    password=self.datos_formulario['paso2'].get('password', 'temp123'),
+                    password=password,
                     datos_personales=datos
                 )
                 
                 self.usuario_repo.agregar(postulante)
                 
                 messagebox.showinfo(
-                    "✓ Registro Completado",
+                    "✅ Registro Completado",
                     f"¡Felicitaciones! Tu registro se ha completado exitosamente.\n\n"
                     f"📋 DATOS DE ACCESO:\n"
                     f"═══════════════\n"
